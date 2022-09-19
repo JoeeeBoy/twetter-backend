@@ -1,6 +1,5 @@
+import { Comment } from "../Models/Comment.model.js";
 import { Post } from "../Models/Post.model.js";
-
-
 
 export const postControllers = {
   create: async (req, res) => {
@@ -10,7 +9,7 @@ export const postControllers = {
       const post = await Post.create({
         title,
         text,
-        tags,
+        tags: tags.split(" "),
         image,
         user: req.userId,
       });
@@ -39,7 +38,7 @@ export const postControllers = {
   getOne: async (req, res) => {
     try {
       const postId = req.params.id;
-      console.log(postId);
+
       Post.findOneAndUpdate(
         { _id: postId },
         { $inc: { viewsCount: 1 } },
@@ -57,10 +56,11 @@ export const postControllers = {
               message: "Статья не найдена",
             });
           }
-
           return res.json(doc);
         }
-      ).populate("user");
+      )
+        .populate("user")
+        .populate("comments");
     } catch (err) {
       console.log(err);
       res.status(500).json({
@@ -71,35 +71,39 @@ export const postControllers = {
 
   remove: async (req, res) => {
     const postId = req.params.id;
+    try {
+      await Comment.deleteMany({ post: postId });
 
-    Post.findOneAndDelete(
-      {
-        _id: postId,
-      },
-      (err, doc) => {
-        if (err) {
-          console.log(err);
-          res.status(404).json({
-            message: "Не удалось удалить статью",
+      Post.findOneAndDelete(
+        {
+          _id: postId,
+        },
+        (err, doc) => {
+          if (err) {
+            console.log(err);
+            res.status(404).json({
+              message: "Не удалось удалить статью",
+            });
+          }
+
+          if (!doc) {
+            return res.status(404).json({
+              message: "Статья не найдена",
+            });
+          }
+          return res.json({
+            message: "Статья удалена",
           });
         }
-
-        if (!doc) {
-          return res.status(404).json({
-            message: "Статья не найдена",
-          });
-        }
-
-        return res.json({
-          message: "Статья удалена",
-        });
-      }
-    );
+      );
+    } catch (err) {
+      console.log(err);
+    }
   },
 
   update: async (req, res) => {
     try {
-      const { title, text, tags, image} = req.body;
+      const { title, text, tags, image } = req.body;
 
       const postId = req.params.id;
 
@@ -110,7 +114,7 @@ export const postControllers = {
         {
           title,
           text,
-          tags,
+          tags: tags.split(" "),
           image,
           user: req.userId,
         }
@@ -129,16 +133,19 @@ export const postControllers = {
 
   getLastTags: async (req, res) => {
     try {
-    const posts = await Post.find().limit(5).exec()
+      const posts = await Post.find().limit(5).exec();
 
-    const tags = posts.map(obj => obj.tags).flat().slice(0, 5)
+      const tags = posts
+        .map((obj) => obj.tags)
+        .flat()
+        .slice(0, 5);
 
-    res.json(tags)
+      res.json(tags);
     } catch (err) {
-        console.log(err);
-        res.status(404).json({
-            message: "ошибка запроса"
-        })
+      console.log(err);
+      res.status(404).json({
+        message: "ошибка запроса",
+      });
     }
-  }
+  },
 };

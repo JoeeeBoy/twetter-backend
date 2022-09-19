@@ -109,5 +109,5 @@ export const userController = {
     res.json({
       url: `/uploads/${req.file.originalname}`,
     });
-  }
+  },
 };

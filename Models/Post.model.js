@@ -24,6 +24,10 @@ const PostShema = mongoose.Schema(
       ref: "User",
       require: true,
     },
+    comments: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Comment"
+    }],
     image: String,
   },
   {

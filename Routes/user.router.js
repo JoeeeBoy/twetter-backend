@@ -32,6 +32,7 @@ router.post(
   userController.userAuth
 );
 router.get("/auth/me", checkAuth, userController.userGet);
-router.post("/upload", checkAuth, upload.single("image"), userController.uploads)
+router.post("/uploads", checkAuth, upload.single("image"), userController.uploads)
+
 
 export default router;

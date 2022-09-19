@@ -23,4 +23,3 @@ const UserShema = mongoose.Schema(
 );
 
 export const User = mongoose.model("User", UserShema);
-

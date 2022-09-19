@@ -2,16 +2,18 @@ import express from "express";
 import mongoose from "mongoose";
 import users from "./Routes/user.router.js";
 import posts from "./Routes/post.router.js";
-import cors from "cors"
+import comments from "./Routes/comment.router.js"
+import cors from "cors";
 
 const app = express();
 
-
 app.use(express.json());
-app.use(cors())
-app.use("/uploads", express.static("uploads"))
+app.use(cors());
+
+app.use("/uploads", express.static("uploads"));
 app.use(users);
 app.use(posts);
+app.use(comments)
 
 mongoose
   .connect(

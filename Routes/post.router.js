@@ -23,5 +23,5 @@ router.post(
   postCreateValidation,
   postControllers.create
 );
-router.get("/tags", postControllers.getLastTags)
+router.get("/tags", postControllers.getLastTags);
 export default router;
